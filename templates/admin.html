@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-white p-10">
+
+<div class="flex justify-between mb-6">
+    <h1 class="text-3xl text-yellow-400">📩 Admin Panel</h1>
+    <a href="/logout" class="bg-red-500 px-4 py-2 rounded">Logout</a>
+</div>
+
+{% for msg in messages %}
+<div class="bg-slate-800 p-4 mb-4 rounded">
+    <p class="text-yellow-400 font-bold">{{ msg.name }}</p>
+    <p>{{ msg.message }}</p>
+    <p class="text-xs text-gray-400">
+        {{ msg.timestamp.strftime('%d %b %Y %I:%M %p') }}
+    </p>
+    <a href="/delete/{{ msg.id }}" class="text-red-400 text-sm">Delete</a>
+</div>
+{% endfor %}
+
+</body>
+</html>
