@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ramadan Mubarak</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: radial-gradient(circle at top, #0f172a, #020617);
+            overflow-x: hidden;
+        }
+
+        /* 🌙 Animated Moon */
+        .moon {
+            position: absolute;
+            top: 80px;
+            right: 100px;
+            width: 120px;
+            height: 120px;
+            background: #facc15;
+            border-radius: 50%;
+            box-shadow: 0 0 40px #facc15;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* ✨ Stars */
+        .star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            from { opacity: 0.2; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+
+<body class="text-white min-h-screen relative">
+
+    <!-- 🌟 Random Stars -->
+    <script>
+        for (let i = 0; i < 60; i++) {
+            let star = document.createElement("div");
+            star.className = "star";
+            star.style.top = Math.random() * window.innerHeight + "px";
+            star.style.left = Math.random() * window.innerWidth + "px";
+            document.body.appendChild(star);
+        }
+    </script>
+
+    <!-- 🌙 Moon -->
+    <div class="moon"></div>
+
+    <!-- 🕌 Masjid SVG -->
+    <div class="absolute bottom-0 w-full">
+        <svg viewBox="0 0 1440 320">
+            <path fill="#0f172a" fill-opacity="1"
+                d="M0,224L80,192C160,160,320,96,480,80C640,64,800,96,960,122.7C1120,149,1280,171,1360,181.3L1440,192L1440,320L0,320Z">
+            </path>
+        </svg>
+    </div>
+
+    <!-- 🌙 Header -->
+    <div class="text-center py-16">
+        <h1 class="text-4xl md:text-6xl font-bold text-yellow-400 animate-pulse">
+            🌙 Ramadan Mubarak 🌙
+        </h1>
+        <p class="mt-4 text-gray-300">Today: {{ today }}</p>
+    </div>
+
+    <!-- 📅 Ramadan Calendar -->
+    <div class="px-6 md:px-20 pb-20">
+        <h2 class="text-3xl font-semibold mb-6 text-center">📅 Ramadan Calendar</h2>
+
+        <div class="grid grid-cols-3 md:grid-cols-6 gap-4">
+            {% for day in range(1,31) %}
+            <div class="bg-slate-800 p-4 rounded-xl text-center hover:scale-105 transform transition duration-300">
+                <p class="text-yellow-400 text-lg font-bold">{{ day }}</p>
+                <p class="text-sm text-gray-300">Ramadan</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>
