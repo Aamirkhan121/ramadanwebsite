@@ -1,9 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
-from datetime import datetime
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from datetime import datetime, timedelta
 import random
 import os
+from werkzeug.security import generate_password_hash, check_password_hash
+# base_sehri = datetime(2026, 2, 19, 5, 12)
+# base_iftar = datetime(2026, 2, 19, 18, 24)
+
 
 app = Flask(__name__)
 
@@ -16,6 +20,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
+login_manager.init_app(app)
 login_manager.login_view = "login"
 
 # ======================
@@ -48,17 +53,34 @@ quotes = [
     "Make dua, Allah is listening 🤲"
 ]
 
+
 @app.route('/')
 def home():
     today = datetime.now().strftime("%d %B %Y")
     random_quote = random.choice(quotes)
     messages = Message.query.order_by(Message.timestamp.desc()).all()
 
+    start_date = datetime(2026, 2, 19)
+
+    base_sehri = datetime(2026, 2, 19, 5, 00)
+    base_iftar = datetime(2026, 2, 19, 17, 45)
+
+    dates = []
+
+    for i in range(30):
+        english_date = (start_date + timedelta(days=i)).strftime("%d %B %Y")
+
+        sehri_time = (base_sehri - timedelta(minutes=i)).strftime("%I:%M %p")
+        iftar_time = (base_iftar + timedelta(minutes=i)).strftime("%I:%M %p")
+
+        dates.append((i+1, english_date, sehri_time, iftar_time))
+
     return render_template(
         "index.html",
         today=today,
         quote=random_quote,
-        messages=messages
+        messages=messages,
+        dates=dates
     )
 
 @app.route('/contact', methods=['POST'])
@@ -77,6 +99,8 @@ def contact():
 # LOGIN
 # ======================
 
+from flask import flash
+
 @app.route('/login', methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -85,14 +109,12 @@ def login():
 
         user = User.query.filter_by(username=username).first()
 
-        print("User Found:", user)  # DEBUG
-
-        if user and user.password == password:
+        if user and check_password_hash(user.password, password):
             login_user(user)
-            print("Login Successful")
+            flash("Login Successful ✅", "success")
             return redirect(url_for("admin"))
         else:
-            print("Login Failed")
+            flash("Invalid Username or Password ❌", "danger")
 
     return render_template("login.html")
 
@@ -126,7 +148,10 @@ if __name__ == "__main__":
 
         # Create default admin if not exists
         if not User.query.filter_by(username="admin").first():
-            admin = User(username="admin", password="khanadmin123")
+            admin = User(
+    username="admin",
+    password=generate_password_hash("khanadmin123")
+)
             db.session.add(admin)
             db.session.commit()
 
